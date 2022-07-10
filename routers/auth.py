@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-from passlib.context import CryptContext
+from utils.users_utils import get_user, verify_user, hash_password
 
 from models import User, UserInDB, SignupForm
 
@@ -43,40 +43,9 @@ def create_user(form_data: SignupForm = Depends()):
     return {"detail": "User created successfully!"}
 
 
-# Utils
-def hash_password(password: str):
-    passwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-    return passwd_context.hash(password)
-
-
-def verify_hash(password_input, hashed_password):
-    passwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-    return passwd_context.verify(password_input, hashed_password)
-
-
-def get_user(username: str, db):
-    for user in db:
-        if user["username"] == username:
-            return UserInDB(**user)
-    return None
-
-
-def verify_user(form_data):
-    user = get_user(form_data.username, users_db)
-
-    if user:
-        password_input = form_data.password
-        hashed_password = user.hashed_password
-
-        if verify_hash(password_input, hashed_password):
-            return user
-
-
 @router.post("/login")
 def user_login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = verify_user(form_data)
+    user = verify_user(form_data, users_db)
     print(hash_password(form_data.password))
 
     if user is None:
