@@ -22,15 +22,28 @@ users_db = [
 ]
 
 
-@router.post("/register")
+@router.post("/register", status_code=201)
 def create_user(form_data: SignupForm = Depends()):
+    user = get_user(form_data.username, users_db)
 
-    return {"msg": "OK"}
+    if user:
+        raise HTTPException(status_code=400, detail="Username already in use!")
+
+    # user doesn't already exist
+    hashed_password = hash_password(form_data.password)
+    user = UserInDB(
+        username=form_data.username,
+        name=form_data.name,
+        email=form_data.email,
+        hashed_password=hashed_password,
+    )
+
+    users_db.append(dict(user))
+
+    return {"detail": "User created successfully!"}
 
 
 # Utils
-
-
 def hash_password(password: str):
     passwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
