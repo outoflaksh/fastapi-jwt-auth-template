@@ -5,8 +5,8 @@ from routers import items, auth
 app = FastAPI()
 
 # Routers
-app.include_router(items.router, prefix="/items")
-app.include_router(auth.router)
+app.include_router(items.router, prefix="/items", tags=["items (protected)"])
+app.include_router(auth.router, tags=["auth"])
 
 
 @app.get("/healthcheck")
