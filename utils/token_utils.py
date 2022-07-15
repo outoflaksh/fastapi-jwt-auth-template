@@ -3,6 +3,7 @@ from datetime import datetime, time, timedelta
 from typing import Union
 from jose import jwt, JWTError
 from fastapi import HTTPException
+from fastapi.security import OAuth2PasswordBearer
 
 
 # Env vars
@@ -11,6 +12,9 @@ from dotenv import load_dotenv
 from models import TokenData
 
 load_dotenv()
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 # Token config
 SECRET_KEY = os.environ.get("SECRET_KEY")
