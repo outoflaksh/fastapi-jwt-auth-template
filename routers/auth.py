@@ -5,14 +5,12 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from utils.users_utils import get_user, verify_user, hash_password
 from utils.token_utils import create_access_token
 
-from models import User, UserInDB, SignupForm
+from models import User, UserInDB, SignupForm, Token
 
 # Auth flow: username and password are sent once and then a token is returned,
 # which then has to be included in the headers of any protected route
 
 router = APIRouter()
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -47,7 +45,7 @@ def create_user(form_data: SignupForm = Depends()):
     return {"detail": "User created successfully!"}
 
 
-@router.post("/login")
+@router.post("/login", response_model=Token)
 def user_login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = verify_user(form_data, users_db)
 
