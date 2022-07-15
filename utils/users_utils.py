@@ -1,6 +1,8 @@
+from fastapi import Depends
 from passlib.context import CryptContext
 
 from models import UserInDB
+from .token_utils import decode_access_token, oauth2_scheme
 
 
 def hash_password(password: str):
@@ -31,3 +33,7 @@ def verify_user(form_data, db):
 
         if verify_hash(password_input, hashed_password):
             return user
+
+
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    return decode_access_token(token)
